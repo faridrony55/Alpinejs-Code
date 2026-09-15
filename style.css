@@ -43,8 +43,12 @@ nav ul{
     list-style: none;
 
 }
-nav li a{
-    color: #000;
+nav li a {
+    color: #fff;
+    background-color: #af6c5c;
+    text-decoration: none;
     display: block;
-
+    padding-block: 6px;
+    padding-inline: 15px;
+    border-radius: 4px;
 }

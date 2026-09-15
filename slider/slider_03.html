@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Alpine.js Multi Column Slider</title>
+    <link rel="stylesheet" href="../style.css">
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+        defer
+    ></script>
+
+    <style>
+        
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .slider {
+            position: relative;
+
+            width: 100%;
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            outline: none;
+        }
+
+        .slider-viewport {
+            position: relative;
+
+            width: 100%;
+
+            overflow: hidden;
+        }
+
+        .slider-track {
+            display: flex;
+
+            width: 100%;
+
+            transition-property: transform;
+            transition-timing-function: ease;
+
+            will-change: transform;
+
+            touch-action: pan-y;
+        }
+
+        .slide {
+            position: relative;
+
+            flex: 0 0 auto;
+
+            min-width: 0;
+        }
+
+        .slide-card {
+            position: relative;
+
+            height: 420px;
+
+            overflow: hidden;
+
+            border-radius: 16px;
+
+            background: #111;
+        }
+
+        .slide-card img {
+            display: block;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .slide-card::after {
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    to top,
+                    rgba(0, 0, 0, .78),
+                    rgba(0, 0, 0, .08) 65%
+                );
+
+            pointer-events: none;
+        }
+
+        .slide-content {
+            position: absolute;
+
+            left: 25px;
+            right: 25px;
+            bottom: 25px;
+
+            z-index: 2;
+
+            color: #fff;
+        }
+
+        .slide-content h2 {
+            margin: 0 0 8px;
+
+            font-size: 25px;
+            line-height: 1.2;
+        }
+
+        .slide-content p {
+            margin: 0 0 16px;
+
+            font-size: 15px;
+            line-height: 1.5;
+
+            color: rgba(255, 255, 255, .85);
+        }
+
+        .slide-content a {
+            display: inline-flex;
+
+            padding: 10px 17px;
+
+            border-radius: 7px;
+
+            background: #fff;
+            color: #111;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            text-decoration: none;
+        }
+
+        .slider-arrow {
+            position: absolute;
+
+            top: 50%;
+
+            z-index: 20;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 46px;
+            height: 46px;
+
+            padding: 0;
+
+            border: 0;
+            border-radius: 50%;
+
+            background: #fff;
+            color: #111;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            transform: translateY(-50%);
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .12);
+
+            transition:
+                transform .2s ease,
+                background .2s ease;
+        }
+
+        .slider-arrow:hover {
+            background: #f0f0f0;
+
+            transform:
+                translateY(-50%)
+                scale(1.05);
+        }
+
+        .slider-arrow:disabled {
+            opacity: .45;
+
+            cursor: not-allowed;
+
+            transform: translateY(-50%);
+        }
+
+        .slider-prev {
+            left: -23px;
+        }
+
+        .slider-next {
+            right: -23px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            margin-top: 25px;
+        }
+
+        .pagination button {
+            width: 9px;
+            height: 9px;
+
+            padding: 0;
+
+            border: 0;
+            border-radius: 50%;
+
+            background: #c7c7c7;
+
+            cursor: pointer;
+
+            transition:
+                width .25s ease,
+                background .25s ease;
+        }
+
+        .pagination button.active {
+            width: 25px;
+
+            border-radius: 20px;
+
+            background: #111;
+        }
+
+        @media (max-width: 1250px) {
+
+            .slider {
+                max-width: calc(100% - 50px);
+            }
+
+            .slider-prev {
+                left: -20px;
+            }
+
+            .slider-next {
+                right: -20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 25px 15px;
+            }
+
+            .slider {
+                max-width: 100%;
+            }
+
+            .slide-card {
+                height: 380px;
+            }
+
+            .slider-prev {
+                left: 10px;
+            }
+
+            .slider-next {
+                right: 10px;
+            }
+
+            .slider-arrow {
+                width: 40px;
+                height: 40px;
+
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .slide-card {
+                height: 360px;
+            }
+
+            .slide-content {
+                left: 20px;
+                right: 20px;
+                bottom: 20px;
+            }
+
+            .slide-content h2 {
+                font-size: 22px;
+            }
+
+            .slide-content p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="slider_01.html">Fade Slide</a></li>
+            <li><a href="slider_02.html">Horizontal Slide</a></li>
+            <li><a href="slider_03.html">Multi Column Slide</a></li>
+        </ul>
+    </nav>
+
+<div x-data="multiSlider({
+        slidesPerView: 3,
+        spaceBetween: 24,
+        slidesPerGroup: 1,
+        speed: 600,
+
+        loop: true,
+
+        centeredSlides: false,
+
+        initialSlide: 0,
+
+        autoplay: {
+            enabled: true,
+            delay: 4000,
+            pauseOnMouseEnter: true,
+            disableOnInteraction: false
+        },
+
+        navigation: true,
+
+        pagination: true,
+
+        keyboard: true,
+
+        allowTouchMove: true,
+
+        grabCursor: true,
+
+        breakpoints: {
+            0: {
+                slidesPerView: 1,
+                spaceBetween: 15
+            },
+
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 20
+            },
+
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 24
+            },
+
+            1280: {
+                slidesPerView: 4,
+                spaceBetween: 24
+            }
+        }
+    })"
+
+    x-init="init()"
+
+    @keydown.left.prevent="prev()"
+    @keydown.right.prevent="next()"
+
+    @mouseenter="mouseEnter()"
+    @mouseleave="mouseLeave()"
+
+    tabindex="0"
+
+    class="slider"
+>
+
+
+    <div
+        class="slider-viewport"
+
+        @touchstart="touchStart($event)"
+        @touchend="touchEnd($event)"
+    >
+
+        <div
+            class="slider-track"
+
+            :style="trackStyle()"
+        >
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+                        alt="Mountain"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Mountain Adventure
+                        </h2>
+
+                        <p>
+                            Discover beautiful mountain landscapes.
+                        </p>
+
+                        <a href="#">
+                            Explore
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80"
+                        alt="Ocean"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Ocean Escape
+                        </h2>
+
+                        <p>
+                            Relax beside beautiful blue waters.
+                        </p>
+
+                        <a href="#">
+                            Discover
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80"
+                        alt="Nature"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Nature
+                        </h2>
+
+                        <p>
+                            Experience incredible natural landscapes.
+                        </p>
+
+                        <a href="#">
+                            Learn More
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1200&q=80"
+                        alt="Forest"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Into the Forest
+                        </h2>
+
+                        <p>
+                            Find peace and inspiration in nature.
+                        </p>
+
+                        <a href="#">
+                            Explore
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=80"
+                        alt="Lake"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Lake Retreat
+                        </h2>
+
+                        <p>
+                            Escape to a quiet place surrounded by nature.
+                        </p>
+
+                        <a href="#">
+                            Discover
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="slide">
+
+                <div class="slide-card">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=80"
+                        alt="Forest trees"
+                    >
+
+                    <div class="slide-content">
+
+                        <h2>
+                            Wild Places
+                        </h2>
+
+                        <p>
+                            Discover the beauty of untouched landscapes.
+                        </p>
+
+                        <a href="#">
+                            View More
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <button
+        x-show="navigation"
+
+        type="button"
+
+        class="slider-arrow slider-prev"
+
+        @click="prev()"
+
+        :disabled="!loop && !canPrev()"
+
+        aria-label="Previous slide"
+    >
+        &#8592;
+    </button>
+
+
+    <button
+        x-show="navigation"
+
+        type="button"
+
+        class="slider-arrow slider-next"
+
+        @click="next()"
+
+        :disabled="!loop && !canNext()"
+
+        aria-label="Next slide"
+    >
+        &#8594;
+    </button>
+
+
+    <div
+        x-show="pagination"
+
+        class="pagination"
+
+        role="tablist"
+    >
+
+        <template
+            x-for="(_, index) in paginationItems()"
+            :key="index"
+        >
+
+            <button
+                type="button"
+
+                @click="goTo(index)"
+
+                :class="{
+                    active: realIndex() === index
+                }"
+
+                :aria-label="`Go to slide ${index + 1}`"
+
+                :aria-selected="
+                    realIndex() === index
+                "
+
+                role="tab"
+            ></button>
+
+        </template>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function multiSlider(options = {}) {
+
+    return {
+
+        current: 0,
+
+        slides: [],
+
+        originalSlides: [],
+
+        timer: null,
+
+        touchStartX: 0,
+
+        touchEndX: 0,
+
+        currentSlidesPerView: 1,
+
+        currentSpaceBetween: 0,
+
+        slideWidth: 0,
+
+        trackOffset: 0,
+
+        isTransitioning: false,
+
+        isMouseOver: false,
+
+        resizeTimer: null,
+
+        slidesPerView: options.slidesPerView ?? 1,
+
+        spaceBetween: options.spaceBetween ?? 0,
+
+        slidesPerGroup: options.slidesPerGroup ?? 1,
+
+        speed: options.speed ?? 300,
+
+        loop: options.loop ?? false,
+
+        centeredSlides: options.centeredSlides ?? false,
+
+        initialSlide: options.initialSlide ?? 0,
+
+        autoplay: options.autoplay ?? false,
+
+        navigation: options.navigation ?? true,
+
+        pagination: options.pagination ?? true,
+
+        keyboard: options.keyboard ?? true,
+
+        allowTouchMove: options.allowTouchMove ?? true,
+
+        grabCursor: options.grabCursor ?? false,
+
+        breakpoints: options.breakpoints ?? {},
+
+        cloneCount: 0,
+
+        init() {
+
+            this.originalSlides = Array.from(
+                this.$root.querySelectorAll(
+                    '.slider-track > .slide'
+                )
+            );
+
+            if (!this.originalSlides.length) {
+                return;
+            }
+
+            this.applyResponsiveOptions();
+
+            this.buildLoop();
+
+            this.updateDimensions();
+
+            this.current =
+                this.loop
+                    ? this.cloneCount + this.initialSlide
+                    : Math.min(
+                        this.initialSlide,
+                        this.maxIndex()
+                    );
+
+            this.$nextTick(() => {
+                this.updateDimensions();
+
+                this.startAutoplay();
+            });
+
+            window.addEventListener(
+                'resize',
+                () => this.handleResize()
+            );
+
+            if (this.keyboard) {
+                this.$root.focus();
+            }
+        },
+
+        applyResponsiveOptions() {
+
+            const width = window.innerWidth;
+
+            let matched = {
+                slidesPerView: this.slidesPerView,
+                spaceBetween: this.spaceBetween
+            };
+
+            Object.keys(this.breakpoints)
+                .map(Number)
+                .sort((a, b) => a - b)
+                .forEach((breakpoint) => {
+
+                    if (width >= breakpoint) {
+                        matched = {
+                            ...matched,
+                            ...this.breakpoints[breakpoint]
+                        };
+                    }
+
+                });
+
+            this.currentSlidesPerView =
+                matched.slidesPerView ?? 1;
+
+            this.currentSpaceBetween =
+                matched.spaceBetween ?? 0;
+        },
+
+        buildLoop() {
+
+            const track =
+                this.$root.querySelector(
+                    '.slider-track'
+                );
+
+            if (!track) {
+                return;
+            }
+
+            track
+                .querySelectorAll('.slide-clone')
+                .forEach((clone) => clone.remove());
+
+            this.slides =
+                Array.from(
+                    track.querySelectorAll(
+                        '.slide:not(.slide-clone)'
+                    )
+                );
+
+            if (!this.loop) {
+
+                this.slides =
+                    Array.from(
+                        track.querySelectorAll('.slide')
+                    );
+
+                return;
+            }
+
+            this.cloneCount =
+                Math.min(
+                    this.slides.length,
+                    Math.ceil(
+                        Number(
+                            this.currentSlidesPerView
+                        )
+                    ) + 1
+                );
+
+            const prepend =
+                this.slides
+                    .slice(-this.cloneCount)
+                    .map((slide) => {
+
+                        const clone =
+                            slide.cloneNode(true);
+
+                        clone.classList.add(
+                            'slide-clone'
+                        );
+
+                        return clone;
+
+                    });
+
+            const append =
+                this.slides
+                    .slice(0, this.cloneCount)
+                    .map((slide) => {
+
+                        const clone =
+                            slide.cloneNode(true);
+
+                        clone.classList.add(
+                            'slide-clone'
+                        );
+
+                        return clone;
+
+                    });
+
+            prepend.forEach((clone) => {
+                track.prepend(clone);
+            });
+
+            append.forEach((clone) => {
+                track.append(clone);
+            });
+
+            this.slides =
+                Array.from(
+                    track.querySelectorAll('.slide')
+                );
+        },
+
+        updateDimensions() {
+
+            const viewport =
+                this.$root.querySelector(
+                    '.slider-viewport'
+                );
+
+            if (!viewport) {
+                return;
+            }
+
+            const width =
+                viewport.getBoundingClientRect().width;
+
+            const perView =
+                Number(
+                    this.currentSlidesPerView
+                );
+
+            this.slideWidth =
+                (
+                    width
+                    - (
+                        this.currentSpaceBetween
+                        * (perView - 1)
+                    )
+                ) / perView;
+
+            this.slides.forEach((slide) => {
+
+                slide.style.width =
+                    `${this.slideWidth}px`;
+
+                slide.style.marginRight =
+                    `${this.currentSpaceBetween}px`;
+
+            });
+
+            this.updateTrack(false);
+        },
+
+        updateTrack(animate = true) {
+
+            const track =
+                this.$root.querySelector(
+                    '.slider-track'
+                );
+
+            if (!track) {
+                return;
+            }
+
+            track.style.transitionDuration =
+                animate
+                    ? `${this.speed}ms`
+                    : '0ms';
+
+            let offset =
+                this.current
+                * (
+                    this.slideWidth
+                    + this.currentSpaceBetween
+                );
+
+            if (this.centeredSlides) {
+
+                const viewport =
+                    this.$root
+                        .querySelector(
+                            '.slider-viewport'
+                        );
+
+                const viewportWidth =
+                    viewport?.getBoundingClientRect()
+                        .width ?? 0;
+
+                offset -=
+                    (
+                        viewportWidth
+                        - this.slideWidth
+                    ) / 2;
+
+            }
+
+            this.trackOffset = offset;
+
+            track.style.transform =
+                `translate3d(${-offset}px, 0, 0)`;
+        },
+
+        trackStyle() {
+
+            return {
+                transform:
+                    `translate3d(${-this.trackOffset}px, 0, 0)`,
+
+                transitionDuration:
+                    `${this.speed}ms`
+            };
+        },
+
+        maxIndex() {
+
+            return Math.max(
+                0,
+                this.originalSlides.length
+                - Math.ceil(
+                    Number(
+                        this.currentSlidesPerView
+                    )
+                )
+            );
+        },
+
+        realIndex() {
+
+            if (!this.originalSlides.length) {
+                return 0;
+            }
+
+            if (!this.loop) {
+                return Math.min(
+                    this.current,
+                    this.originalSlides.length - 1
+                );
+            }
+
+            return (
+                this.current
+                - this.cloneCount
+                + this.originalSlides.length
+            )
+            % this.originalSlides.length;
+        },
+
+        paginationItems() {
+
+            if (!this.originalSlides.length) {
+                return [];
+            }
+
+            if (this.slidesPerGroup > 1) {
+
+                return Array.from(
+                    {
+                        length:
+                            Math.ceil(
+                                this.originalSlides.length
+                                / this.slidesPerGroup
+                            )
+                    }
+                );
+
+            }
+
+            return this.originalSlides;
+        },
+
+        next() {
+
+            if (!this.originalSlides.length) {
+                return;
+            }
+
+            if (
+                !this.loop
+                && !this.canNext()
+            ) {
+                return;
+            }
+
+            const step =
+                this.slidesPerGroup;
+
+            this.current += step;
+
+            this.updateTrack(true);
+
+            this.restartAutoplay();
+
+            this.isTransitioning = true;
+
+            setTimeout(
+                () => this.normalizeLoop(),
+                this.speed + 20
+            );
+        },
+
+        prev() {
+
+            if (!this.originalSlides.length) {
+                return;
+            }
+
+            if (
+                !this.loop
+                && !this.canPrev()
+            ) {
+                return;
+            }
+
+            const step =
+                this.slidesPerGroup;
+
+            this.current -= step;
+
+            this.updateTrack(true);
+
+            this.restartAutoplay();
+
+            this.isTransitioning = true;
+
+            setTimeout(
+                () => this.normalizeLoop(),
+                this.speed + 20
+            );
+        },
+
+        goTo(index) {
+
+            if (!this.originalSlides.length) {
+                return;
+            }
+
+            if (this.loop) {
+
+                this.current =
+                    this.cloneCount
+                    + (
+                        index
+                        % this.originalSlides.length
+                    );
+
+            } else {
+
+                this.current =
+                    Math.min(
+                        index,
+                        this.maxIndex()
+                    );
+
+            }
+
+            this.updateTrack(true);
+
+            this.restartAutoplay();
+        },
+
+        normalizeLoop() {
+
+            if (!this.loop) {
+                this.isTransitioning = false;
+                return;
+            }
+
+            const total =
+                this.originalSlides.length;
+
+            if (
+                this.current
+                >= this.cloneCount + total
+            ) {
+
+                this.current -= total;
+
+                this.updateTrack(false);
+
+            }
+
+            if (
+                this.current
+                < this.cloneCount
+            ) {
+
+                this.current += total;
+
+                this.updateTrack(false);
+
+            }
+
+            this.isTransitioning = false;
+        },
+
+        canNext() {
+
+            return (
+                this.current
+                < this.maxIndex()
+            );
+        },
+
+        canPrev() {
+
+            return this.current > 0;
+        },
+
+        startAutoplay() {
+
+            this.stopAutoplay();
+
+            if (
+                !this.autoplay
+                || !this.autoplay.enabled
+            ) {
+                return;
+            }
+
+            this.timer =
+                setInterval(
+                    () => {
+
+                        if (
+                            this.autoplay.pauseOnMouseEnter
+                            && this.isMouseOver
+                        ) {
+                            return;
+                        }
+
+                        this.next();
+
+                    },
+                    this.autoplay.delay ?? 5000
+                );
+        },
+
+        stopAutoplay() {
+
+            if (this.timer) {
+
+                clearInterval(this.timer);
+
+                this.timer = null;
+            }
+        },
+
+        restartAutoplay() {
+
+            if (
+                !this.autoplay
+                || !this.autoplay.enabled
+            ) {
+                return;
+            }
+
+            if (
+                this.autoplay.disableOnInteraction
+            ) {
+
+                this.stopAutoplay();
+
+                return;
+            }
+
+            this.startAutoplay();
+        },
+
+        mouseEnter() {
+
+            this.isMouseOver = true;
+        },
+
+        mouseLeave() {
+
+            this.isMouseOver = false;
+        },
+
+        touchStart(event) {
+
+            if (!this.allowTouchMove) {
+                return;
+            }
+
+            this.touchStartX =
+                event.changedTouches[0]
+                    .screenX;
+        },
+
+        touchEnd(event) {
+
+            if (!this.allowTouchMove) {
+                return;
+            }
+
+            this.touchEndX =
+                event.changedTouches[0]
+                    .screenX;
+
+            const distance =
+                this.touchEndX
+                - this.touchStartX;
+
+            const threshold = 50;
+
+            if (
+                Math.abs(distance)
+                < threshold
+            ) {
+                return;
+            }
+
+            if (distance < 0) {
+                this.next();
+            } else {
+                this.prev();
+            }
+        },
+
+        handleResize() {
+
+            clearTimeout(
+                this.resizeTimer
+            );
+
+            this.resizeTimer =
+                setTimeout(() => {
+
+                    const previousRealIndex =
+                        this.realIndex();
+
+                    this.applyResponsiveOptions();
+
+                    this.buildLoop();
+
+                    this.updateDimensions();
+
+                    this.current =
+                        this.loop
+                            ? this.cloneCount
+                              + Math.min(
+                                  previousRealIndex,
+                                  this.originalSlides.length - 1
+                              )
+                            : Math.min(
+                                previousRealIndex,
+                                this.maxIndex()
+                            );
+
+                    this.updateTrack(false);
+
+                }, 150);
+        }
+    };
+}
+
+</script>
+
+</body>
+</html>
